@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav>
+    <h2>My Applications</h2>
+    <button onclick="logout()">Logout</button>
+  </nav>
+
+  <div class="form">
+    <input id="company" placeholder="Company">
+    <input id="role" placeholder="Role">
+    <input id="status" placeholder="Status">
+    <button onclick="addApplication()">Add</button>
+  </div>
+
+  <div id="cards" class="grid"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
