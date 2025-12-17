@@ -24,3 +24,43 @@ def list_applications(
     return db.query(models.Application).filter(
         models.Application.owner_id == user.id
     ).all()
+
+@router.put("/{app_id}")
+def update_application(
+    app_id: int,
+    app_data: schemas.ApplicationCreate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    app = db.query(models.Application).filter(
+        models.Application.id == app_id,
+        models.Application.owner_id == user.id
+    ).first()
+
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    app.company = app_data.company
+    app.role = app_data.role
+    app.status = app_data.status
+
+    db.commit()
+    return {"message": "Application updated"}
+
+@router.delete("/{app_id}")
+def delete_application(
+    app_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    app = db.query(models.Application).filter(
+        models.Application.id == app_id,
+        models.Application.owner_id == user.id
+    ).first()
+
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    db.delete(app)
+    db.commit()
+    return {"message": "Application deleted"}
