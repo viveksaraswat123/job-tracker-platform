@@ -10,6 +10,14 @@ class UserLogin(BaseModel):
     password: str
 
 
+class UserOut(BaseModel):
+    id: int
+    email: str
+
+    class Config:
+        from_attributes = True
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -25,4 +33,4 @@ class ApplicationOut(ApplicationCreate):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

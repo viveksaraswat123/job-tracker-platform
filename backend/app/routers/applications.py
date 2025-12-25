@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .. import schemas, models
 from ..deps import get_db, get_current_user
@@ -24,6 +24,22 @@ def list_applications(
     return db.query(models.Application).filter(
         models.Application.owner_id == user.id
     ).all()
+
+@router.get("/{app_id}", response_model=schemas.ApplicationOut)
+def get_application(
+    app_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    app = db.query(models.Application).filter(
+        models.Application.id == app_id,
+        models.Application.owner_id == user.id
+    ).first()
+
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    return app
 
 @router.put("/{app_id}")
 def update_application(

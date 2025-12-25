@@ -7,21 +7,83 @@ body {
   font-family: system-ui;
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
   color: white;
+  min-height: 100vh;
+}
+
+.hero {
+  text-align: center;
+  padding: 100px 20px;
+  background: rgba(0,0,0,0.3);
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 40px;
+}
+
+.stats {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat h3 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.stat p {
+  margin: 5px 0 0 0;
+  opacity: 0.8;
 }
 
 .container {
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 40px 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+}
+
+.tab.active {
+  background: rgba(255,255,255,0.2);
 }
 
 .card {
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(10px);
   padding: 40px;
-  border-radius: 12px;
-  width: 320px;
+  border-radius: 0 12px 12px 12px;
+  width: 100%;
 }
 
 input {
@@ -40,6 +102,11 @@ button {
   color: white;
   border: none;
   cursor: pointer;
+  border-radius: 6px;
+}
+
+button:hover {
+  background: #333;
 }
 
 nav {

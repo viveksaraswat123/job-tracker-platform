@@ -1,24 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Job Tracker</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Job Tracker - Track Your Career Journey</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
+  <div class="hero">
+    <div class="hero-content">
+      <h1>Job Application Tracker</h1>
+      <p>Never lose track of your job applications again. Organize, monitor, and succeed in your career search.</p>
+      <div id="stats" class="stats">
+        <div class="stat">
+          <h3 id="total-users">0</h3>
+          <p>Registered Users</p>
+        </div>
+        <div class="stat">
+          <h3 id="total-apps">0</h3>
+          <p>Applications Tracked</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
-    <div class="card">
-      <h2>Welcome Back</h2>
+    <div class="auth-container">
+      <div class="tabs">
+        <button id="login-tab" class="tab active" onclick="showLogin()">Login</button>
+        <button id="register-tab" class="tab" onclick="showRegister()">Register</button>
+      </div>
 
-      <input id="email" placeholder="Email">
-      <input id="password" type="password" placeholder="Password">
+      <div id="login-form" class="card">
+        <h2>Welcome Back</h2>
+        <input id="login-email" placeholder="Email">
+        <input id="login-password" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="login-msg"></p>
+      </div>
 
-      <button onclick="login()">Login</button>
-      <p id="msg"></p>
+      <div id="register-form" class="card" style="display: none;">
+        <h2>Join Us</h2>
+        <input id="register-email" placeholder="Email">
+        <input id="register-password" type="password" placeholder="Password">
+        <button onclick="register()">Register</button>
+        <p id="register-msg"></p>
+      </div>
     </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="app.js"></script>
+  <script src="/static/app.js"></script>
 </body>
 </html>
