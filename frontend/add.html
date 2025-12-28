@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Add Job • Job Tracker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center h-screen">
+
+<div class="bg-white p-6 rounded-2xl shadow w-full mx-5 md:w-[420px]">
+  <h2 class="text-2xl font-bold mb-4">Add Job Application</h2>
+
+  <input id="company" placeholder="Company Name" class="border w-full px-3 py-2 rounded-lg mb-2"/>
+  <input id="role" placeholder="Job Role" class="border w-full px-3 py-2 rounded-lg mb-2"/>
+
+  <select id="status" class="border w-full px-3 py-2 rounded-lg mb-2">
+    <option>Applied</option>
+    <option>Interview</option>
+    <option>Rejected</option>
+    <option>Offer</option>
+  </select>
+
+  <input id="date" type="date" class="border w-full px-3 py-2 rounded-lg mb-3"/>
+
+  <button onclick="addApplication()" class="w-full bg-black text-white py-2 rounded-lg">Submit</button>
+  <p id="msg" class="text-center text-sm mt-3"></p>
+</div>
+
+<script>
+async function addApplication(){
+  const payload = {
+    company: document.getElementById("company").value,
+    role: document.getElementById("role").value,
+    status: document.getElementById("status").value,
+    date: document.getElementById("date").value
+  };
+
+  const res = await fetch("/applications/add", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+  document.getElementById("msg").innerText = data.message;
+}
+</script>
+
+</body>
+</html>

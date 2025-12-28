@@ -1,54 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Job Tracker - Track Your Career Journey</title>
-  <link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Job Tracker • Career Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body>
 
-  <div class="hero">
-    <div class="hero-content">
-      <h1>Job Application Tracker</h1>
-      <p>Never lose track of your job applications again. Organize, monitor, and succeed in your career search.</p>
-      <div id="stats" class="stats">
-        <div class="stat">
-          <h3 id="total-users">0</h3>
-          <p>Registered Users</p>
-        </div>
-        <div class="stat">
-          <h3 id="total-apps">0</h3>
-          <p>Applications Tracked</p>
-        </div>
-      </div>
+<body id="body" class="bg-gray-50 text-gray-800 transition-all">
+
+<nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
+  <div class="text-2xl font-bold">Job Tracker</div>
+  <div class="space-x-3">
+    <button onclick="toggleTheme()" class="px-3 py-1 border rounded-lg">Theme</button>
+    <button onclick="openModal()" class="px-4 py-2 bg-black text-white rounded-lg">+ Add</button>
+  </div>
+</nav>
+
+<section class="max-w-6xl mx-auto mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 px-6">
+  <div class="bg-white p-5 rounded-2xl shadow"><h3 class="font-semibold">Users</h3><p id="total-users" class="text-4xl font-bold">0</p></div>
+  <div class="bg-white p-5 rounded-2xl shadow"><h3 class="font-semibold">Applications</h3><p id="total-apps" class="text-4xl font-bold">0</p></div>
+  <div class="bg-white p-5 rounded-2xl shadow"><h3 class="font-semibold">Offers</h3><p id="offers" class="text-4xl font-bold">0</p></div>
+</section>
+
+<section class="max-w-6xl mx-auto mt-10 px-6">
+  <div class="bg-white p-6 rounded-2xl shadow">
+    <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
+      <h3 class="text-xl font-bold">Applications</h3>
+
+      <input onkeyup="searchTable()" id="search" placeholder="Search company..." class="border px-3 py-2 rounded-lg w-full md:w-60">
+
+      <select onchange="filterStatus()" id="filter" class="border px-3 py-2 rounded-lg w-full md:w-40">
+        <option value="ALL">All Status</option>
+        <option value="Applied">Applied</option>
+        <option value="Interview">Interview</option>
+        <option value="Rejected">Rejected</option>
+        <option value="Offer">Offer</option>
+      </select>
+    </div>
+
+    <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="border-b">
+          <th class="py-2">Company</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="app-list"></tbody>
+    </table>
     </div>
   </div>
+</section>
 
-  <div class="container">
-    <div class="auth-container">
-      <div class="tabs">
-        <button id="login-tab" class="tab active" onclick="showLogin()">Login</button>
-        <button id="register-tab" class="tab" onclick="showRegister()">Register</button>
-      </div>
-
-      <div id="login-form" class="card">
-        <h2>Welcome Back</h2>
-        <input id="login-email" placeholder="Email">
-        <input id="login-password" type="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p id="login-msg"></p>
-      </div>
-
-      <div id="register-form" class="card" style="display: none;">
-        <h2>Join Us</h2>
-        <input id="register-email" placeholder="Email">
-        <input id="register-password" type="password" placeholder="Password">
-        <button onclick="register()">Register</button>
-        <p id="register-msg"></p>
-      </div>
-    </div>
+<!-- Modal -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+  <div class="bg-white p-6 rounded-2xl shadow-lg w-full mx-6 md:w-[400px]">
+    <h2 class="text-xl font-bold mb-3">Add Job</h2>
+    <input id="company" placeholder="Company" class="border w-full px-3 py-2 rounded-lg mb-2">
+    <input id="role" placeholder="Role" class="border w-full px-3 py-2 rounded-lg mb-2">
+    <select id="status" class="border w-full px-3 py-2 rounded-lg mb-2">
+      <option>Applied</option>
+      <option>Interview</option>
+      <option>Rejected</option>
+      <option>Offer</option>
+    </select>
+    <input id="date" type="date" class="border w-full px-3 py-2 rounded-lg mb-3">
+    <button onclick="addJob()" class="w-full bg-black text-white py-2 rounded-lg">Save</button>
+    <button onclick="closeModal()" class="w-full mt-2 border py-2 rounded-lg">Cancel</button>
   </div>
+</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="/static/app.js"></script>
+<script src="/static/app.js"></script>
+<script>
+gsap.from(".bg-white", {y:30, opacity:0, duration:0.6, stagger:0.15});
+</script>
+
 </body>
 </html>

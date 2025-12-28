@@ -34,3 +34,10 @@ class ApplicationOut(ApplicationCreate):
 
     class Config:
         from_attributes = True
+
+
+class Job(BaseModel):
+    company: str
+    role: str
+    status: str
+    date: str

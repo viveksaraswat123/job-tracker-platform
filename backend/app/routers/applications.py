@@ -80,3 +80,16 @@ def delete_application(
     db.delete(app)
     db.commit()
     return {"message": "Application deleted"}
+
+
+@router.post("/applications/add")
+def add_application(job: schemas.Job, db: Session = Depends(get_db)):
+    new_job = models.Application(
+        company = job.company,
+        role = job.role,
+        status = job.status,
+        date = job.date
+    )
+    db.add(new_job)
+    db.commit()
+    return {"message": "Application stored"}

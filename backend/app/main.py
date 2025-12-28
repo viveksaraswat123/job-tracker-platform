@@ -5,10 +5,10 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 from .database import engine
 from . import models
-from .routers import auth, applications
+from .routers import auth, applications, add_page
 from .deps import get_db
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -24,6 +24,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(applications.router)
+app.include_router(add_page.router)  # 👈 mounted add page
 
 frontend_path = Path(__file__).parent.parent.parent / "frontend"
 app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
@@ -39,5 +40,3 @@ def serve_dashboard():
 @app.get("/health")
 def health():
     return {"status": "API running"}
-
-

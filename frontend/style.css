@@ -9,6 +9,7 @@ body {
   color: white;
   min-height: 100vh;
 }
+.hero { display:none } 
 
 .hero {
   text-align: center;
