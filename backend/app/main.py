@@ -37,6 +37,10 @@ def serve_homepage():
 def serve_dashboard():
     return FileResponse(frontend_path / "dashboard.html")
 
+@app.get("/profile")
+def serve_profile_page():
+    return FileResponse(frontend_path / "profile.html")
+
 @app.get("/health")
 def health():
     return {"status": "API running"}

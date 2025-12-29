@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
-
+from fastapi import UploadFile, File
+from pathlib import Path
+from ..schemas import UserProfileOut, UserProfileUpdate
 from .. import schemas, models, auth
 from ..deps import get_db, get_current_user
 
@@ -87,3 +89,89 @@ def get_current_user_info(
     user=Depends(get_current_user)
 ):
     return user
+
+
+# GET full profile
+@router.get("/profile", response_model=UserProfileOut)
+def full_profile(user=Depends(get_current_user), db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
+    return db_user
+
+
+# UPDATE profile details
+@router.put("/profile/update")
+def update_profile(
+    profile: UserProfileUpdate,
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
+
+    for key, value in profile.dict().items():
+        if value is not None:
+            setattr(db_user, key, value)
+
+    db.commit()
+    return {"message": "Profile updated successfully"}
+
+
+# UPLOAD avatar
+@router.post("/profile/avatar")
+def upload_avatar(
+    file: UploadFile = File(...),
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    save_path = Path("frontend/static/avatars")
+    save_path.mkdir(parents=True, exist_ok=True)
+
+    filename = f"{user.id}-{file.filename}"
+    with open(save_path / filename, "wb") as f:
+        f.write(file.file.read())
+
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
+    db_user.avatar = f"/static/avatars/{filename}"
+    db.commit()
+
+    return {"message": "Avatar uploaded successfully"}
+
+
+# UPLOAD resume
+@router.post("/profile/resume")
+def upload_resume(
+    file: UploadFile = File(...),
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    save_path = Path("frontend/static/resume")
+    save_path.mkdir(parents=True, exist_ok=True)
+
+    filename = f"{user.id}-{file.filename}"
+    with open(save_path / filename, "wb") as f:
+        f.write(file.file.read())
+
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
+    db_user.resume = f"/static/resume/{filename}"
+    db.commit()
+
+    return {"message": "Resume uploaded successfully"}
+
+
+# PROFILE ANALYTICS
+@router.get("/profile/stats")
+def profile_stats(user=Depends(get_current_user), db: Session = Depends(get_db)):
+    apps = db.query(models.Application).filter(models.Application.user_id == user.id).all()
+
+    return {
+        "applied": len([a for a in apps if a.status=="Applied"]),
+        "interview": len([a for a in apps if a.status=="Interview"]),
+        "rejected": len([a for a in apps if a.status=="Rejected"]),
+        "offers": len([a for a in apps if a.status=="Offer"])
+    }
+
+
+# PROFILE TIMELINE
+@router.get("/profile/timeline")
+def profile_timeline(user=Depends(get_current_user), db: Session = Depends(get_db)):
+    apps = db.query(models.Application).filter(models.Application.user_id == user.id).all()
+    return [f"{a.company} → {a.status} ({a.date})" for a in apps]
