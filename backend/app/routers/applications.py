@@ -82,7 +82,7 @@ def delete_application(
     return {"message": "Application deleted"}
 
 
-@router.post("/applications/add")
+@router.post("/add")
 def add_application(job: schemas.Job, db: Session = Depends(get_db)):
     new_job = models.Application(
         company = job.company,

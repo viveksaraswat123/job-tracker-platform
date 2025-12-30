@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -8,80 +7,104 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 
-<body class="bg-gray-50 text-gray-900 transition-all">
+<body id="body" class="bg-[#f5f5f7] text-gray-900 transition-all">
 
-<nav class="bg-white shadow px-6 py-4 flex justify-between items-center">
-  <div class="text-2xl font-bold">Job Tracker</div>
-  <a href="/dashboard" class="px-4 py-2 bg-black text-white rounded-lg">Dashboard</a>
-</nav>
+<!-- Banner + Profile Header -->
+<section class="relative w-full h-48 bg-black">
+  <div class="absolute -bottom-14 left-1/2 -translate-x-1/2">
+    <img id="avatar-img" src="/static/default-avatar.png"
+      class="w-28 h-28 rounded-full border-4 border-white shadow-lg object-cover"/>
+    <input type="file" id="avatar" accept="image/*" class="hidden" onchange="uploadAvatar()"/>
+    <button onclick="document.getElementById('avatar').click()"
+      class="absolute bottom-1 right-2 bg-white text-black text-xs px-2 py-1 rounded-full shadow">
+      Change Photo
+    </button>
+  </div>
+</section>
 
-<div class="max-w-5xl mx-auto mt-8 px-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="max-w-5xl mx-auto mt-20 px-6">
 
-  <!-- LEFT SECTION -->
-  <div class="bg-white p-6 rounded-2xl shadow text-center">
-    <img id="avatar-img" class="w-28 h-28 mx-auto rounded-full shadow mb-3 object-cover" src="/static/default-avatar.png"/>
-    <h2 id="user-name" class="text-2xl font-bold">Loading...</h2>
-    <p id="user-email" class="text-sm text-gray-500">---</p>
-    <p id="user-phone" class="mt-1">---</p>
+  <h2 id="user-name" class="text-3xl font-bold text-center">Loading...</h2>
+  <p id="user-email" class="text-center text-gray-500 text-sm mb-6">---</p>
 
-    <div class="mt-4 text-left space-y-2">
-      <h3 class="font-semibold text-lg">Skills</h3>
-      <p id="user-skills" class="text-sm text-gray-700">---</p>
-
-      <h3 class="font-semibold text-lg">Resume</h3>
-      <a id="resume-link" href="#" target="_blank" class="text-blue-600 text-sm">No resume uploaded</a>
-
-      <h3 class="font-semibold text-lg">Social Links</h3>
-      <p class="text-sm">
-        <a id="linkedin" href="#" class="text-blue-600">LinkedIn</a> •
-        <a id="github" href="#" class="text-black">GitHub</a> •
-        <a id="portfolio" href="#" class="text-green-600">Portfolio</a>
-      </p>
-    </div>
-
-    <!-- Upload Buttons -->
-    <input type="file" id="avatar" class="hidden" accept="image/*" onchange="uploadAvatar()"/>
-    <input type="file" id="resume" class="hidden" accept=".pdf,.docx" onchange="uploadResume()"/>
-
-    <div class="mt-5 space-y-2">
-      <button onclick="document.getElementById('avatar').click()" class="w-full border px-3 py-2 rounded-lg">Upload Avatar</button>
-      <button onclick="document.getElementById('resume').click()" class="w-full border px-3 py-2 rounded-lg">Upload Resume</button>
-    </div>
-    <p id="msg" class="text-sm mt-3"></p>
+  <!-- Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-8">
+    <div class="bg-white p-4 rounded-2xl shadow"><p class="text-sm">Applied</p><p id="stat-applied" class="text-2xl font-bold">0</p></div>
+    <div class="bg-white p-4 rounded-2xl shadow"><p class="text-sm">Interview</p><p id="stat-interview" class="text-2xl font-bold">0</p></div>
+    <div class="bg-white p-4 rounded-2xl shadow"><p class="text-sm">Rejected</p><p id="stat-rejected" class="text-2xl font-bold">0</p></div>
+    <div class="bg-white p-4 rounded-2xl shadow"><p class="text-sm">Offers</p><p id="stat-offer" class="text-2xl font-bold">0</p></div>
   </div>
 
-  <!-- MIDDLE SECTION -->
-  <div class="lg:col-span-2 space-y-6">
+  <!-- Main Card -->
+  <div class="bg-white border border-gray-200 p-8 rounded-3xl shadow-xl">
 
-    <!-- STATS -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-white p-4 rounded-xl shadow"><h3>Applied</h3><p id="applied" class="text-3xl font-bold">0</p></div>
-      <div class="bg-white p-4 rounded-xl shadow"><h3>Interview</h3><p id="interview" class="text-3xl font-bold">0</p></div>
-      <div class="bg-white p-4 rounded-xl shadow"><h3>Offers</h3><p id="offer-count" class="text-3xl font-bold">0</p></div>
-    </div>
+    <h3 class="text-2xl font-bold mb-6">Personal Information</h3>
 
-    <!-- PROFILE FORM -->
-    <div class="bg-white p-6 rounded-2xl shadow">
-      <h3 class="text-xl font-bold mb-3">Edit Profile</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input id="name" placeholder="Full Name" class="border px-3 py-2 rounded-lg"/>
-        <input id="phone" placeholder="Phone" class="border px-3 py-2 rounded-lg"/>
-        <input id="skills" placeholder="Skills (comma separated)" class="border px-3 py-2 rounded-lg"/>
-        <input id="location" placeholder="Location" class="border px-3 py-2 rounded-lg"/>
-        <input id="linkedin-input" placeholder="LinkedIn URL" class="border px-3 py-2 rounded-lg"/>
-        <input id="github-input" placeholder="GitHub URL" class="border px-3 py-2 rounded-lg"/>
-        <input id="portfolio-input" placeholder="Portfolio URL" class="border px-3 py-2 rounded-lg"/>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <div>
+        <label class="font-semibold text-sm">Full Name</label>
+        <input id="name" class="border w-full px-4 py-2 rounded-xl mt-1"/>
       </div>
-      <button onclick="updateProfile()" class="mt-4 w-full bg-black text-white py-2 rounded-lg">Save Changes</button>
+
+      <div>
+        <label class="font-semibold text-sm">Phone</label>
+        <input id="phone" class="border w-full px-4 py-2 rounded-xl mt-1"/>
+      </div>
+
+      <div>
+        <label class="font-semibold text-sm">Skills</label>
+        <input id="skills" placeholder="Spring Boot, FastAPI, SQL, Python..."
+          class="border w-full px-4 py-2 rounded-xl mt-1"/>
+      </div>
+
+      <div>
+        <label class="font-semibold text-sm">Location</label>
+        <input id="location" placeholder="Noida, India"
+          class="border w-full px-4 py-2 rounded-xl mt-1"/>
+      </div>
+
+      <div>
+        <label class="font-semibold text-sm">LinkedIn</label>
+        <input id="linkedin" placeholder="linkedin.com/in/vivek"
+          class="border w-full px-4 py-2 rounded-xl mt-1"/>
+      </div>
+
+      <div>
+        <label class="font-semibold text-sm">GitHub</label>
+        <input id="github" placeholder="github.com/viveksaraswat123"
+          class="border w-full px-4 py-2 rounded-xl mt-1"/>
+      </div>
+
+      <div>
+        <label class="font-semibold text-sm">Portfolio</label>
+        <input id="portfolio" placeholder="myportfolio.dev"
+          class="border w-full px-4 py-2 rounded-xl mt-1"/>
+      </div>
+
+      <div>
+        <label class="font-semibold text-sm">Resume</label>
+        <input type="file" id="resume" accept=".pdf,.docx"
+          class="border w-full px-2 py-2 rounded-xl mt-1" onchange="uploadResume()"/>
+        <a id="resume-link" target="_blank" class="text-blue-600 text-xs mt-1 block">No resume uploaded</a>
+      </div>
+
     </div>
 
-    <!-- TIMELINE -->
-    <div class="bg-white p-6 rounded-2xl shadow">
-      <h3 class="text-xl font-bold mb-4">Application Timeline</h3>
-      <div id="timeline" class="space-y-3"></div>
-    </div>
+    <button onclick="updateProfile()" class="mt-8 w-full bg-black text-white py-3 rounded-xl font-semibold">
+      Save Profile
+    </button>
+
+    <p id="msg" class="text-center text-sm text-green-600 mt-3"></p>
 
   </div>
+
+  <!-- Timeline -->
+  <div class="mt-10">
+    <h3 class="text-xl font-bold mb-3">Application Timeline</h3>
+    <div id="timeline" class="space-y-2"></div>
+  </div>
+
 </div>
 
 <script>
@@ -91,14 +114,16 @@ async function loadProfile(){
   const res = await fetch("/auth/profile", { headers:{ "Authorization":"Bearer "+token }});
   const u = await res.json();
 
-  document.getElementById("avatar-img").src = u.avatar || "/static/default-avatar.png";
-  document.getElementById("user-name").innerText = u.name;
+  document.getElementById("user-name").innerText = u.name || "Add Your Name";
   document.getElementById("user-email").innerText = u.email;
-  document.getElementById("user-phone").innerText = u.phone;
-  document.getElementById("user-skills").innerText = u.skills;
-  document.getElementById("linkedin").href = u.linkedin;
-  document.getElementById("github").href = u.github;
-  document.getElementById("portfolio").href = u.portfolio;
+  document.getElementById("avatar-img").src = u.avatar || "/static/default-avatar.png";
+  document.getElementById("name").value = u.name || "";
+  document.getElementById("phone").value = u.phone || "";
+  document.getElementById("skills").value = u.skills || "";
+  document.getElementById("location").value = u.location || "";
+  document.getElementById("linkedin").value = u.linkedin || "";
+  document.getElementById("github").value = u.github || "";
+  document.getElementById("portfolio").value = u.portfolio || "";
   document.getElementById("resume-link").href = u.resume || "#";
 
   loadStats();
@@ -106,20 +131,21 @@ async function loadProfile(){
 }
 
 async function loadStats(){
-  const r = await fetch("/auth/profile/stats", { headers:{ "Authorization":"Bearer "+token }});
-  const s = await r.json();
-  document.getElementById("applied").innerText = s.applied;
-  document.getElementById("interview").innerText = s.interview;
-  document.getElementById("offer-count").innerText = s.offers;
+  const res = await fetch("/auth/profile/stats", { headers:{ "Authorization":"Bearer "+token }});
+  const s = await res.json();
+  document.getElementById("stat-applied").innerText = s.applied;
+  document.getElementById("stat-interview").innerText = s.interview;
+  document.getElementById("stat-rejected").innerText = s.rejected;
+  document.getElementById("stat-offer").innerText = s.offers;
 }
 
 async function loadTimeline(){
-  const r = await fetch("/auth/profile/timeline", { headers:{ "Authorization":"Bearer "+token }});
-  const list = await r.json();
+  const res = await fetch("/auth/profile/timeline", { headers:{ "Authorization":"Bearer "+token }});
+  const list = await res.json();
   const box = document.getElementById("timeline");
   box.innerHTML="";
-  list.forEach(t=>{
-    box.innerHTML += `<div class="border-l-4 pl-3 py-1 text-sm">${t}</div>`;
+  list.forEach(a=>{
+    box.innerHTML += `<div class="bg-white p-3 rounded-xl shadow text-xs">${a}</div>`;
   });
 }
 
@@ -129,9 +155,9 @@ async function updateProfile(){
     phone: document.getElementById("phone").value,
     skills: document.getElementById("skills").value,
     location: document.getElementById("location").value,
-    linkedin: document.getElementById("linkedin-input").value,
-    github: document.getElementById("github-input").value,
-    portfolio: document.getElementById("portfolio-input").value
+    linkedin: document.getElementById("linkedin").value,
+    github: document.getElementById("github").value,
+    portfolio: document.getElementById("portfolio").value
   };
 
   const res = await fetch("/auth/profile/update", {
@@ -142,32 +168,29 @@ async function updateProfile(){
 
   const d = await res.json();
   document.getElementById("msg").innerText = d.message;
-  loadProfile();
 }
 
 async function uploadAvatar(){
-  let file = document.getElementById("avatar").files[0];
-  let form = new FormData();
+  const file = document.getElementById("avatar").files[0];
+  const form = new FormData();
   form.append("file", file);
 
-  const res = await fetch("/auth/profile/avatar", { method:"POST", headers:{ "Authorization":"Bearer "+token }, body: form });
+  const res = await fetch("/auth/profile/avatar", { method:"POST", headers:{ "Authorization":"Bearer "+token }, body:form });
   const d = await res.json();
   document.getElementById("msg").innerText = d.message;
-  loadProfile();
 }
 
 async function uploadResume(){
-  let file = document.getElementById("resume").files[0];
-  let form = new FormData();
+  const file = document.getElementById("resume").files[0];
+  const form = new FormData();
   form.append("file", file);
 
-  const res = await fetch("/auth/profile/resume", { method:"POST", headers:{ "Authorization":"Bearer "+token }, body: form });
+  const res = await fetch("/auth/profile/resume", { method:"POST", headers:{ "Authorization":"Bearer "+token }, body:form });
   const d = await res.json();
   document.getElementById("msg").innerText = d.message;
-  loadProfile();
 }
 
-gsap.from("nav, .rounded-2xl", {y:25,opacity:0,stagger:0.2,duration:0.6});
+gsap.from("section, nav, .bg-white", {y:30,opacity:0,duration:0.6,stagger:0.2});
 loadProfile();
 </script>
 

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login / Register • Job Tracker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); }
+  body.dark { background:#0f0f0f; color:#e5e5e5; }
+  .dark .glass { background:rgba(20,20,20,0.7); border-color:#333; }
+</style>
+</head>
+
+<body id="body" class="bg-gray-100 flex justify-center items-center h-screen transition-all">
+
+<div class="w-full max-w-md mx-6 glass border border-gray-200 p-8 rounded-3xl shadow-xl">
+  <div class="tabs flex gap-3 mb-6 justify-center">
+    <button id="login-tab" onclick="showLogin()" class="px-5 py-2 font-semibold border-b-2 border-black">Login</button>
+    <button id="register-tab" onclick="showRegister()" class="px-5 py-2 font-semibold border-b-2 border-transparent text-gray-500">Register</button>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="login-form" class="space-y-4">
+    <h2 class="text-2xl font-bold text-center mb-2">Welcome Back</h2>
+    <p class="text-sm text-center text-gray-500 mb-4">Track jobs. Crack interviews. Convert offers.</p>
+
+    <input id="login-email" placeholder="Email" class="border w-full px-4 py-2 rounded-xl text-sm"/>
+    <input id="login-password" type="password" placeholder="Password" class="border w-full px-4 py-2 rounded-xl text-sm"/>
+
+    <button onclick="login()" class="w-full bg-black text-white py-2 rounded-xl font-semibold hover:opacity-90">Login</button>
+    <p id="login-msg" class="text-center text-sm text-red-600"></p>
+  </div>
+
+  <!-- REGISTER FORM -->
+  <div id="register-form" class="space-y-4 hidden">
+    <h2 class="text-2xl font-bold text-center mb-2">Create Account</h2>
+    <p class="text-sm text-center text-gray-500 mb-4">Join thousands of job seekers.</p>
+
+    <input id="register-email" placeholder="Email" class="border w-full px-4 py-2 rounded-xl text-sm"/>
+    <input id="register-password" type="password" placeholder="Create Password" class="border w-full px-4 py-2 rounded-xl text-sm"/>
+    <input id="register-confirm" type="password" placeholder="Confirm Password" class="border w-full px-4 py-2 rounded-xl text-sm"/>
+
+    <button onclick="register()" class="w-full bg-black text-white py-2 rounded-xl font-semibold hover:opacity-90">Register</button>
+    <p id="register-msg" class="text-center text-sm text-red-600"></p>
+  </div>
+</div>
+
+<script>
+function showLogin(){
+  document.getElementById("login-form").classList.remove("hidden");
+  document.getElementById("register-form").classList.add("hidden");
+  document.getElementById("login-tab").classList.add("border-black");
+  document.getElementById("register-tab").classList.remove("border-black","text-gray-900");
+  document.getElementById("register-tab").classList.add("text-gray-500");
+}
+
+function showRegister(){
+  document.getElementById("login-form").classList.add("hidden");
+  document.getElementById("register-form").classList.remove("hidden");
+  document.getElementById("register-tab").classList.add("border-black","text-gray-900");
+  document.getElementById("login-tab").classList.remove("border-black");
+  document.getElementById("login-tab").classList.add("text-gray-500");
+}
+
+async function login(){
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value.trim();
+
+  const form = new URLSearchParams();
+  form.append("username", email);
+  form.append("password", password);
+
+  const res = await fetch("/auth/login", { method:"POST", body:form });
+  const data = await res.json();
+
+  if(res.status === 200){
+    localStorage.setItem("token", data.access_token);
+    document.getElementById("login-msg").innerText = "Login successful!";
+    setTimeout(()=> window.location.href="/dashboard", 800);
+  } else {
+    document.getElementById("login-msg").innerText = data.detail;
+  }
+}
+
+async function register(){
+  const email = document.getElementById("register-email").value.trim();
+  const pass = document.getElementById("register-password").value.trim();
+  const confirm = document.getElementById("register-confirm").value.trim();
+
+  if(pass !== confirm){
+    document.getElementById("register-msg").innerText = "Passwords do not match";
+    return;
+  }
+
+  const payload = { email, password: pass };
+  const res = await fetch("/auth/register", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+  if(res.status === 201){
+    document.getElementById("register-msg").innerText = "Registered successfully! You can login now.";
+    showLogin();
+  } else {
+    document.getElementById("register-msg").innerText = data.detail;
+  }
+}
+
+function toggleTheme(){
+  document.getElementById("body").classList.toggle("dark");
+}
+
+gsap.from(".glass", {y:30,opacity:0,duration:0.6});
+</script>
+
+</body>
+</html>

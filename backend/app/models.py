@@ -1,11 +1,4 @@
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    ForeignKey,
-    DateTime,
-    Enum
-)
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -20,7 +13,6 @@ class ApplicationStatus(str, enum.Enum):
     offer = "Offer"
 
 
-
 class User(Base):
     __tablename__ = "users"
 
@@ -32,7 +24,7 @@ class User(Base):
     applications = relationship(
         "Application",
         back_populates="owner",
-        cascade="all, delete"
+        cascade="all, delete-orphan"
     )
 
     def __repr__(self):
@@ -50,7 +42,7 @@ class Application(Base):
         default=ApplicationStatus.applied,
         nullable=False
     )
-    created_at = Column(DateTime, default=datetime.utcnow)
+    applied_on = Column(DateTime, default=datetime.utcnow)
 
     owner_id = Column(
         Integer,
@@ -61,4 +53,4 @@ class Application(Base):
     owner = relationship("User", back_populates="applications")
 
     def __repr__(self):
-        return f"<Application id={self.id} company={self.company}>"
+        return f"<Application id={self.id} company={self.company} role={self.role} status={self.status}>"

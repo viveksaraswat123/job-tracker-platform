@@ -40,6 +40,9 @@ def serve_dashboard():
 @app.get("/profile")
 def serve_profile_page():
     return FileResponse(frontend_path / "profile.html")
+@app.get("/login")
+def serve_profile_page():
+    return FileResponse(frontend_path / "login.html")
 
 @app.get("/health")
 def health():
