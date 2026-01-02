@@ -8,7 +8,7 @@ from . import models
 from .routers import auth, applications, add_page
 from .deps import get_db
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.cors import CORSMiddleware
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -40,8 +40,9 @@ def serve_dashboard():
 @app.get("/profile")
 def serve_profile_page():
     return FileResponse(frontend_path / "profile.html")
+
 @app.get("/login")
-def serve_profile_page():
+def serve_login_page():
     return FileResponse(frontend_path / "login.html")
 
 @app.get("/health")
