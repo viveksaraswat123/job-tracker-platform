@@ -11,10 +11,23 @@ def create_application(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    # Check if job exists
+    job = db.query(models.Job).filter(models.Job.id == app.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Check if already applied
+    existing = db.query(models.Application).filter(
+        models.Application.owner_id == user.id,
+        models.Application.job_id == app.job_id
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Already applied to this job")
+
     new_app = models.Application(**app.dict(), owner_id=user.id)
     db.add(new_app)
     db.commit()
-    return {"message": "Application added"}
+    return {"message": "Application submitted"}
 
 @router.get("/", response_model=list[schemas.ApplicationOut])
 def list_applications(
@@ -44,7 +57,7 @@ def get_application(
 @router.put("/{app_id}")
 def update_application(
     app_id: int,
-    app_data: schemas.ApplicationCreate,
+    status: str,
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
@@ -56,10 +69,10 @@ def update_application(
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
 
-    app.company = app_data.company
-    app.role = app_data.role
-    app.status = app_data.status
+    if status not in ["Applied", "Interview", "Rejected", "Offer"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
 
+    app.status = status
     db.commit()
     return {"message": "Application updated"}
 
@@ -80,16 +93,3 @@ def delete_application(
     db.delete(app)
     db.commit()
     return {"message": "Application deleted"}
-
-
-@router.post("/add")
-def add_application(job: schemas.Job, db: Session = Depends(get_db)):
-    new_job = models.Application(
-        company = job.company,
-        role = job.role,
-        status = job.status,
-        date = job.date
-    )
-    db.add(new_job)
-    db.commit()
-    return {"message": "Application stored"}

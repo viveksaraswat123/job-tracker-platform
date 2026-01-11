@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employer Dashboard • Job Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Employer Dashboard</a>
+    <div class="d-flex">
+      <button onclick="toggleTheme()" class="btn btn-secondary btn-sm me-2">Dark</button>
+      <button onclick="openPostJobModal()" class="btn btn-success btn-sm me-2">+ Post Job</button>
+      <button onclick="logout()" class="btn btn-danger btn-sm">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <aside class="col-lg-3 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Menu</h5>
+          <button onclick="showSection('jobs-section')" class="btn btn-outline-primary w-100 mb-2">My Jobs</button>
+          <button onclick="showSection('applications-section')" class="btn btn-outline-primary w-100 mb-2">Applications</button>
+          <button onclick="showSection('stats-section')" class="btn btn-outline-primary w-100">Stats</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Profile -->
+    <div class="col-lg-3 mb-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <img id="avatar-img" src="/static/default-avatar.png" class="rounded-circle mb-3" style="width: 64px; height: 64px; object-fit: cover;">
+          <h5 id="user-name" class="card-title">Employer</h5>
+          <p id="user-email" class="text-muted small">--</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <section id="stats-section" class="col-lg-6 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 col-lg-3 mb-3">
+              <div class="text-center">
+                <p class="small">Jobs Posted</p>
+                <p id="stat-jobs" class="h4 fw-bold">0</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+              <div class="text-center">
+                <p class="small">Applications</p>
+                <p id="stat-apps" class="h4 fw-bold">0</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+              <div class="text-center">
+                <p class="small">Interviews</p>
+                <p id="stat-interviews" class="h4 fw-bold">0</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+              <div class="text-center">
+                <p class="small">Offers</p>
+                <p id="stat-offers" class="h4 fw-bold">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Jobs -->
+    <section id="jobs-section" class="col-12 mb-4 d-none">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">My Posted Jobs</h5>
+          <div id="jobs-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Applications -->
+    <section id="applications-section" class="col-12 mb-4 d-none">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Job Applications</h5>
+          <div id="applications-list"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Post Job Modal -->
+<div id="post-job-modal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Post New Job</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input id="job-title" type="text" placeholder="Job Title" class="form-control mb-2">
+        <input id="job-company" type="text" placeholder="Company" class="form-control mb-2">
+        <input id="job-location" type="text" placeholder="Location" class="form-control mb-2">
+        <select id="job-type" class="form-select mb-2">
+          <option>full-time</option>
+          <option>part-time</option>
+          <option>contract</option>
+        </select>
+        <input id="salary-min" type="number" placeholder="Min Salary" class="form-control mb-2">
+        <input id="salary-max" type="number" placeholder="Max Salary" class="form-control mb-2">
+        <textarea id="job-description" placeholder="Job Description" class="form-control mb-2" rows="3"></textarea>
+        <textarea id="job-requirements" placeholder="Requirements" class="form-control mb-2" rows="3"></textarea>
+        <p id="post-job-msg" class="text-danger small text-center mt-2"></p>
+      </div>
+      <div class="modal-footer">
+        <button onclick="postJob()" class="btn btn-primary">Post Job</button>
+        <button onclick="closePostJobModal()" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const token = localStorage.getItem("token");
+if (!token) window.location.href = "/";
+
+window.onload = () => {
+  loadProfile();
+  loadStats();
+  loadJobs();
+  showSection('stats-section');
+};
+
+async function loadProfile() {
+  const res = await fetch("/auth/me", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  const u = await res.json();
+  document.getElementById("user-name").innerText = u.name || "Employer";
+  document.getElementById("user-email").innerText = u.email || "";
+  document.getElementById("avatar-img").src = u.avatar || "/static/default-avatar.png";
+}
+
+async function loadStats() {
+  document.getElementById("stat-jobs").innerText = "0";
+  document.getElementById("stat-apps").innerText = "0";
+  document.getElementById("stat-interviews").innerText = "0";
+  document.getElementById("stat-offers").innerText = "0";
+}
+
+async function loadJobs() {
+  const res = await fetch("/jobs/employer/", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  const jobs = await res.json();
+  renderJobs(jobs);
+}
+
+function renderJobs(jobs) {
+  const box = document.getElementById("jobs-list");
+  box.innerHTML = "";
+  jobs.forEach(job => {
+    box.innerHTML += `
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">${job.title}</h5>
+          <p class="card-text">${job.company} • ${job.location}</p>
+          <button onclick="viewApplications(${job.id})" class="btn btn-primary">View Applications</button>
+        </div>
+      </div>`;
+  });
+}
+
+async function viewApplications(jobId) {
+  const res = await fetch(`/jobs/${jobId}/applications`, {
+    headers: { Authorization: "Bearer " + token }
+  });
+  const apps = await res.json();
+  renderApplications(apps);
+  showSection('applications-section');
+}
+
+function renderApplications(apps) {
+  const box = document.getElementById("applications-list");
+  box.innerHTML = "";
+  apps.forEach(app => {
+    box.innerHTML += `
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">${app.owner?.name || app.owner?.email}</h5>
+          <p>Status: <span class="badge bg-primary">${app.status}</span></p>
+          <p>Cover Letter: ${app.cover_letter || "None"}</p>
+          <select onchange="updateStatus(${app.id}, this.value)" class="form-select">
+            <option ${app.status === "Applied" ? "selected" : ""}>Applied</option>
+            <option ${app.status === "Interview" ? "selected" : ""}>Interview</option>
+            <option ${app.status === "Rejected" ? "selected" : ""}>Rejected</option>
+            <option ${app.status === "Offer" ? "selected" : ""}>Offer</option>
+          </select>
+        </div>
+      </div>`;
+  });
+}
+
+async function updateStatus(appId, status) {
+  await fetch(`/applications/${appId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify({ status })
+  });
+}
+
+async function postJob() {
+  const data = {
+    title: document.getElementById("job-title").value,
+    company: document.getElementById("job-company").value,
+    description: document.getElementById("job-description").value,
+    location: document.getElementById("job-location").value,
+    job_type: document.getElementById("job-type").value,
+    salary_min: parseFloat(document.getElementById("salary-min").value) || null,
+    salary_max: parseFloat(document.getElementById("salary-max").value) || null,
+    requirements: document.getElementById("job-requirements").value
+  };
+
+  const res = await fetch("/jobs/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (res.ok) {
+    closePostJobModal();
+    loadJobs();
+    document.getElementById("post-job-msg").innerText = "Job posted successfully!";
+  } else {
+    document.getElementById("post-job-msg").innerText = "Error posting job";
+  }
+}
+
+function showSection(id) {
+  document.querySelectorAll("section").forEach(s => s.classList.add("d-none"));
+  document.getElementById(id).classList.remove("d-none");
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("bg-dark");
+  document.body.classList.toggle("text-white");
+}
+
+function openPostJobModal() {
+  const modal = new bootstrap.Modal(document.getElementById('post-job-modal'));
+  modal.show();
+}
+
+function closePostJobModal() {
+  const modal = bootstrap.Modal.getInstance(document.getElementById('post-job-modal'));
+  modal.hide();
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/";
+}
+</script>
+
+</body>
+</html>

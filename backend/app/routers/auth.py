@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pathlib import Path
 import jwt
 
-from ..schemas import UserProfileOut, UserProfileUpdate, Token
+from ..schemas import UserProfileOut, UserProfileUpdate, Token, UserCreate
 from .. import models, auth
 from ..deps import get_db, get_current_user
 
@@ -20,13 +20,14 @@ def get_db_user(uid: int, db: Session):
     return user
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    if db.query(models.User).filter(models.User.email == user.username).first():
+def register(user_data: UserCreate, db: Session = Depends(get_db)):
+    if db.query(models.User).filter(models.User.email == user_data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
     new_user = models.User(
-        email=user.username,
-        hashed_password=auth.hash_password(user.password)
+        email=user_data.email,
+        hashed_password=auth.hash_password(user_data.password),
+        role=user_data.role
     )
 
     db.add(new_user)
@@ -100,14 +101,14 @@ def profile_stats(user=Depends(get_current_user), db: Session = Depends(get_db))
     apps = db.query(models.Application).filter(models.Application.owner_id == db_user.id).all()
 
     return {
-        "applied": len([a for a in apps if a.status == "Applied"]),
-        "interview": len([a for a in apps if a.status == "Interview"]),
-        "rejected": len([a for a in apps if a.status == "Rejected"]),
-        "offers": len([a for a in apps if a.status == "Offer"])
+        "applied": len([a for a in apps if a.status.value == "Applied"]),
+        "interview": len([a for a in apps if a.status.value == "Interview"]),
+        "rejected": len([a for a in apps if a.status.value == "Rejected"]),
+        "offers": len([a for a in apps if a.status.value == "Offer"])
     }
 
 @router.get("/profile/timeline")
 def profile_timeline(user=Depends(get_current_user), db: Session = Depends(get_db)):
     db_user = get_db_user(user.id, db)
     apps = db.query(models.Application).filter(models.Application.owner_id == db_user.id).all()
-    return [f"{a.company} → {a.status} ({a.date})" for a in apps]
+    return [f"{a.job.company} → {a.status.value} ({a.applied_at.strftime('%Y-%m-%d')})" for a in apps]

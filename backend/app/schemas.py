@@ -1,8 +1,12 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
+from datetime import datetime
+
 
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
+    role: Optional[str] = "job_seeker"
 
 
 class UserLogin(BaseModel):
@@ -13,6 +17,9 @@ class UserLogin(BaseModel):
 class UserOut(BaseModel):
     id: int
     email: str
+    role: str
+    name: Optional[str] = None
+    avatar: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -23,14 +30,38 @@ class Token(BaseModel):
     token_type: str
 
 
-class ApplicationCreate(BaseModel):
+class JobCreate(BaseModel):
+    title: str
     company: str
-    role: str
-    status: str
+    description: str
+    location: str
+    salary_min: Optional[float] = None
+    salary_max: Optional[float] = None
+    job_type: str
+    requirements: Optional[str] = None
 
 
-class ApplicationOut(ApplicationCreate):
+class JobOut(JobCreate):
     id: int
+    posted_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ApplicationCreate(BaseModel):
+    job_id: int
+    cover_letter: Optional[str] = None
+    resume_url: Optional[str] = None
+
+
+class ApplicationOut(BaseModel):
+    id: int
+    status: str
+    applied_at: datetime
+    cover_letter: Optional[str] = None
+    resume_url: Optional[str] = None
+    job: JobOut
 
     class Config:
         from_attributes = True
@@ -46,6 +77,7 @@ class Job(BaseModel):
 class UserProfileOut(BaseModel):
     id: int
     email: str
+    role: str
     name: str | None = None
     phone: str | None = None
     skills: str | None = None

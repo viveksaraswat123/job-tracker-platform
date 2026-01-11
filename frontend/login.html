@@ -36,11 +36,15 @@
   <!-- REGISTER FORM -->
   <div id="register-form" class="space-y-4 hidden">
     <h2 class="text-2xl font-bold text-center mb-2">Create Account</h2>
-    <p class="text-sm text-center text-gray-500 mb-4">Join thousands of job seekers.</p>
+    <p class="text-sm text-center text-gray-500 mb-4">Join thousands of job seekers and employers.</p>
 
     <input id="register-email" placeholder="Email" class="border w-full px-4 py-2 rounded-xl text-sm"/>
     <input id="register-password" type="password" placeholder="Create Password" class="border w-full px-4 py-2 rounded-xl text-sm"/>
     <input id="register-confirm" type="password" placeholder="Confirm Password" class="border w-full px-4 py-2 rounded-xl text-sm"/>
+    <select id="register-role" class="border w-full px-4 py-2 rounded-xl text-sm">
+      <option value="job_seeker">Job Seeker</option>
+      <option value="employer">Employer</option>
+    </select>
 
     <button onclick="register()" class="w-full bg-black text-white py-2 rounded-xl font-semibold hover:opacity-90">Register</button>
     <p id="register-msg" class="text-center text-sm text-red-600"></p>
@@ -78,7 +82,18 @@ async function login(){
   if(res.status === 200){
     localStorage.setItem("token", data.access_token);
     document.getElementById("login-msg").innerText = "Login successful!";
-    setTimeout(()=> window.location.href="/dashboard", 800);
+    
+    // Get user profile to check role
+    const profileRes = await fetch("/auth/me", { headers:{ "Authorization":"Bearer "+data.access_token }});
+    const profile = await profileRes.json();
+    
+    setTimeout(()=> {
+      if(profile.role === "employer"){
+        window.location.href="/employer-dashboard";
+      } else {
+        window.location.href="/dashboard";
+      }
+    }, 800);
   } else {
     document.getElementById("login-msg").innerText = data.detail;
   }
@@ -88,13 +103,14 @@ async function register(){
   const email = document.getElementById("register-email").value.trim();
   const pass = document.getElementById("register-password").value.trim();
   const confirm = document.getElementById("register-confirm").value.trim();
+  const role = document.getElementById("register-role").value;
 
   if(pass !== confirm){
     document.getElementById("register-msg").innerText = "Passwords do not match";
     return;
   }
 
-  const payload = { email, password: pass };
+  const payload = { email, password: pass, role };
   const res = await fetch("/auth/register", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
