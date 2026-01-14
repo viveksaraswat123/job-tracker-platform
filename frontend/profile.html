@@ -204,7 +204,7 @@ async function uploadResume(){
 
   const res = await fetch("/auth/profile/resume", {
     method: "POST",
-    headers: { "Authorization": "Bearer " + token },
+    headers: { "Authorization" : "Bearer " + token },
     body: formData
   });
 
